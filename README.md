@@ -6,7 +6,6 @@ This is the [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) I created 
 * [Raspbian Installation](#raspbian-installation)
 * [OnOff SHIM Installation](#onoff-shim-installation)
 * [Configuring the OnOff SHIM](#configuring-the-onoff-shim)
-* [Creating a Service for GPIO27 Pull-Up](#creating-a-service-for-gpio27-pull-up)
 * [GPIO Button Configuration](#gpio-button-configuration)
 * [References](#references)
 
@@ -49,25 +48,24 @@ This [blog](https://koboldimkopf.wordpress.com/2020/01/10/tutorial-phoniebox/) r
 ![RaspberryPI](assets/raspberrypi.png)
 ![OnOff SHIM](assets/onoffshim.jpg)
 
+
 ### Connecting the GPIO Pins
 
 Connect the OnOff SHIM to the Raspberry Pi GPIO pins as follows:
 * **Pin 2** → **Pin 2** on RPi (5V)
 * **Pin 6** → **Pin 6** on RPi (Ground)
-* **Pin 7** → **Pin 13** on RPi (GPIO27) (default is Pin 7, but I changed it to Pin 13)
+* **Pin 7** → **Pin 7** on RPi (GPIO4) (default is Pin 7, but I changed it to Pin 13 (GPIO27) and needed to use wires)
 * **Pin 9** → **Pin 9** on RPi (Ground)
 * **Pin 11** → **Pin 11** on RPi (GPIO17, trigger)
 
-### How It Works
+I had an issue with **Pin 7 (GPIO4)**, because on my Raspberry Pi it was always high and there was no way to set it to low. So the low signal was never sent to the OnOff SHIM and the raspberrypi was not powering off after the shutdown. Changing it to **Pin 13 (GPIO27)** allowed me to set the pin to low, notifying the pin 7 on OnOff SHIM to cut power.
 
 - **Pin 11** triggers the shutdown process.
-- Once the shutdown is complete, **Pin 7** (connected to GPIO27) is pulled low, cutting power to the Raspberry Pi.
-
-By default, **Pin 7** on my Raspberry Pi was always high, so the signal was never sent to the OnOff SHIM. Changing it to **Pin 13 (GPIO27)** allowed me to set it to low, notifying the OnOff SHIM to cut power.
+- Once the shutdown is complete, **Pin 7** (connected to GPIO27 in my case, but usually on GPIO4) is pulled low, cutting power to the Raspberry Pi.
 
 ---
 
-## Configuring the OnOff SHIM
+### Configuring the GPIO27 to pull up (HIGH) on startup
 
 1. Edit the `cleanshutd.conf` file:
    ```bash
@@ -85,44 +83,84 @@ By default, **Pin 7** on my Raspberry Pi was always high, so the signal was neve
    polling_rate=1
    ```
 
-2. Ensure GPIO27 starts as HIGH by adding the following to `/boot/config.txt`:
+There are 2 wasy to to force the pull-up configuration.
+
+
+#### Add instruction to /boot/config.txt
+
+Adding the following to `/boot/config.txt`:
    ```bash
    gpio=27=ip,pu
    ```
+This unfortunately did not work for me
 
-   If this doesn't work, proceed to create a service to force the pull-up configuration.
+#### Creating a Service for GPIO27 Pull-Up
 
----
+1. Create a new script to force the pull-up on GPIO27:
 
-## Creating a Service for GPIO27 Pull-Up
+Open a terminal and create a script to apply the pull-up:
 
-1. Create a script to apply the pull-up configuration:
-   ```bash
-   sudo nano /usr/local/bin/force_gpio27_pullup.sh
-   ```
+```bash
+sudo nano /usr/local/bin/force_gpio27_pullup.sh
+```
+Add the following content:
 
-   Add the following content:
-   ```bash
-   #!/bin/bash
-   raspi-gpio set 27 ip pu
-   ```
+```
+#!/bin/bash
+raspi-gpio set 27 ip pu
+```
+Save and exit (press CTRL + X, then Y to confirm).
 
 2. Make the script executable:
-   ```bash
-   sudo chmod +x /usr/local/bin/force_gpio27_pullup.sh
-   ```
 
-3. Add the script to `/etc/rc.local` to run at startup:
-   ```bash
-   sudo nano /etc/rc.local
-   ```
+```bash
+sudo chmod +x /usr/local/bin/force_gpio27_pullup.sh
+```
 
-   Add this line before `exit 0`:
-   ```bash
-   /usr/local/bin/force_gpio27_pullup.sh
-   ```
+3. Create a systemd service to run the script after boot:
 
-4. Save and exit. Reboot the Raspberry Pi to apply the changes.
+Create the service:
+
+```bash
+sudo nano /etc/systemd/system/force-gpio27.service
+```
+
+Add the following content:
+```bash
+[Unit]
+Description=Force GPIO27 pull-up
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/force_gpio27_pullup.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+```
+Save and exit (press CTRL + X, then Y to confirm).
+
+4. Enable the service:
+```bash
+sudo systemctl enable force-gpio27.service
+```
+
+5. Reboot the RPi
+```bash
+sudo reboot
+```
+
+6. Check GPIO27 again:
+```bash
+raspi-gpio get 27
+```
+
+It should now show:
+
+```bash
+GPIO 27: level=1 fsel=0 func=INPUT
+```
 
 ---
 
