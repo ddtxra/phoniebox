@@ -2,6 +2,8 @@
 
 This is the [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) I created with my kids.
 
+![phoniebox_mickey](assets/phoniebox_mickey.jpg)
+
 ## Table of Contents
 * [Raspbian Installation](#raspbian-installation)
 * [OnOff SHIM Installation](#onoff-shim-installation)
