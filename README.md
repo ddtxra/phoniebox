@@ -2,7 +2,14 @@
 
 This is the [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) I created with my kids.
 
-![phoniebox_mickey](assets/phoniebox_mickey.jpg)
+![phoniebox_mouse](assets/phoniebox_mouse.jpg)
+
+[Watch the video on YouTube](https://www.youtube.com/shorts/znsAAv1EgLk)
+
+
+<iframe width="560" height="315" src="https://www.youtube.com/shorts/znsAAv1EgLk" 
+frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+</iframe>
 
 ## Table of Contents
 * [Raspbian Installation](#raspbian-installation)
