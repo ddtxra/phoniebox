@@ -63,7 +63,8 @@ I had an issue with **Pin 7 (GPIO4)**, because on my Raspberry Pi it was always 
 - **Pin 11** triggers the shutdown process.
 - Once the shutdown is complete, **Pin 7** (connected to GPIO27 in my case, but usually on GPIO4) is pulled low, cutting power to the Raspberry Pi.
 
----
+![OnOff pins](assets/onoffpins.jpg)
+
 
 ### Configuring the GPIO27 to pull up (HIGH) on startup
 
@@ -83,7 +84,7 @@ I had an issue with **Pin 7 (GPIO4)**, because on my Raspberry Pi it was always 
    polling_rate=1
    ```
 
-There are 2 wasy to to force the pull-up configuration.
+There are 2 ways to to force the pull-up configuration.
 
 
 #### Add instruction to /boot/config.txt
