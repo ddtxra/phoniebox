@@ -6,8 +6,28 @@ This is my Phoniebox project, created for my kids.
 
 1. Install the Bullseye Lite version of Raspberry Pi OS on an SD card.
    ![Raspbian OS](assets/raspbian.png)
-2. Connect the Raspberry Pi to Ethernet.
-3. Install Wi-Fi drivers (not included in the Lite version) and then unplug the Ethernet cable.
+2. Insert SD card in your raspberryp and connect it to the Ethernet.
+3. Install Wi-Fi drivers (not included in the Lite version), configure wifi settings, make sure everything works and then unplug the Ethernet cable.
+
+![OnOff SHIM](assets/onoffshim.jpg)
+![RaspberryPI](assets/raspberrypi.png)
+
+```bash
+sudo apt install firmware-brcm80211 wpasupplicant wireless-tools
+```
+```bash
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+````
+
+```bash
+country=CH
+network={
+        ssid="SSID"
+        psk="Password"
+}
+```
+
+
 4. Note: In my setup, I needed to configure pin 4 instead of pin 27.
 
 ## Configure GPIO Settings
