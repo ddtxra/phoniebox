@@ -1,6 +1,6 @@
 # Phoniebox
 
-This is my Phoniebox project, created for my kids.
+This is my [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) project, created for my kids.
 
 ## Software Installation
 
