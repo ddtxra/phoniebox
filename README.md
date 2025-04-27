@@ -1,19 +1,19 @@
 # Phoniebox
 
-Here is my phoniebox that I created for my kids.
+This is my Phoniebox project, created for my kids.
 
+## Software Installation
 
-## Software installation
+1. Install the Bullseye Lite version of Raspberry Pi OS on an SD card.
+   ![Raspbian OS](assets/raspbian.png)
+2. Connect the Raspberry Pi to Ethernet.
+3. Install Wi-Fi drivers (not included in the Lite version) and then unplug the Ethernet cable.
+4. Note: In my setup, I needed to configure pin 4 instead of pin 27.
 
-1. Install version Bulleseye Lite on a sim card
-2. Plus the Raspberry pi to the Ethernet
-3. Install wifi drivers (not available with the lite version) and unplug Ethernet
-4. 
-In my setting I needed to configure pin 4 instead of pin 27
+## Configure GPIO Settings
 
-## Configure GPIO settings
+I performed a basic GPIO configuration as follows:
 
-I did a very basic configuration
 ```
 [DEFAULT]
 enabled: True
@@ -54,28 +54,49 @@ enabled: True
 Type: Button
 Pin: 26
 functionCall: functionCallVolU
-
 ```
 
+## Configure Pin 27
 
-## Configure pin 27
+To configure pin 27 with a pull-up resistor:
 
-1. Open a terminal and create a script to apply the pull-up:
+1. Open a terminal and create a script to apply the pull-up configuration:
 
-```bash
-sudo nano /usr/local/bin/force_gpio27_pullup.sh
-```
+   ```bash
+   sudo nano /usr/local/bin/force_gpio27_pullup.sh
+   ```
 
+2. Add the following content to the script:
 
-```bash
-#!/bin/bash
-raspi-gpio set 27 ip pu
-```
+   ```bash
+   #!/bin/bash
+   raspi-gpio set 27 ip pu
+   ```
+
+3. Save the file and make it executable:
+
+   ```bash
+   sudo chmod +x /usr/local/bin/force_gpio27_pullup.sh
+   ```
+
+4. Add the script to `/etc/rc.local` to ensure it runs at startup:
+
+   ```bash
+   sudo nano /etc/rc.local
+   ```
+
+   Add the following line before `exit 0`:
+
+   ```bash
+   /usr/local/bin/force_gpio27_pullup.sh
+   ```
+
+5. Save and exit. Reboot the Raspberry Pi to apply the changes.
 
 ## References
 
-Thank very much to the original phoniebox and all tutorials and videos specially:
-* https://koboldimkopf.wordpress.com/2020/01/10/tutorial-phoniebox/
-* https://www.youtube.com/watch?v=9S8yvfvFSNg
+Special thanks to the original Phoniebox project and all the tutorials and videos, especially:
+* [Kobold im Kopf Tutorial](https://koboldimkopf.wordpress.com/2020/01/10/tutorial-phoniebox/)
+* [YouTube Tutorial](https://www.youtube.com/watch?v=9S8yvfvFSNg)
 
 
