@@ -5,8 +5,7 @@ This is the [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) I created 
 ## Table of Contents
 * [Raspbian Installation](#raspbian-installation)
 * [OnOff SHIM Installation](#onoff-shim-installation)
-* [Configuring the OnOff SHIM](#configuring-the-onoff-shim)
-* [GPIO Button Configuration](#gpio-button-configuration)
+* [Phoniebox Installation](#phoniebox-installation)
 * [References](#references)
 
 ---
@@ -58,36 +57,40 @@ Connect the OnOff SHIM to the Raspberry Pi GPIO pins as follows:
 * **Pin 9** → **Pin 9** on RPi (Ground)
 * **Pin 11** → **Pin 11** on RPi (GPIO17, trigger)
 
-I had an issue with **Pin 7 (GPIO4)**, because on my Raspberry Pi it was always high and there was no way to set it to low. So the low signal was never sent to the OnOff SHIM and the raspberrypi was not powering off after the shutdown. Changing it to **Pin 13 (GPIO27)** allowed me to set the pin to low, notifying the pin 7 on OnOff SHIM to cut power.
 
 - **Pin 11** triggers the shutdown process.
 - Once the shutdown is complete, **Pin 7** (connected to GPIO27 in my case, but usually on GPIO4) is pulled low, cutting power to the Raspberry Pi.
 
+I had an issue with **Pin 7 (GPIO4)**, because on my Raspberry Pi it was always high and there was no way to set it to low. So the low signal was never sent to the OnOff SHIM and the raspberrypi was not powering off after the shutdown. Changing it to **Pin 13 (GPIO27)** allowed me to set the pin to low, notifying the pin 7 on OnOff SHIM to cut power.
+
+
+To make this change you need to edit the `cleanshutd.conf` file:
+```bash
+sudo nano /etc/cleanshutd.conf
+```
+
+Update the `poweroff_pin` to match GPIO27:
+```bash
+# Config for cleanshutd
+trigger_pin=17
+led_pin=17
+poweroff_pin=27  # Changed from default (4) to GPIO27
+hold_time=1
+shutdown_delay=0
+polling_rate=1
+```
+
+
 ![OnOff pins](assets/onoffpins.jpg)
 
+To make it work, you need to use a pin that is alwayy set to HIGH. In my case, apart from the GPIO4, all the pins were set to low in the start-up. So I needed to force the GPIO27 to HIGH on start-up. 
 
 ### Configuring the GPIO27 to pull up (HIGH) on startup
-
-1. Edit the `cleanshutd.conf` file:
-   ```bash
-   sudo nano /etc/cleanshutd.conf
-   ```
-
-   Update the `poweroff_pin` to match GPIO27:
-   ```bash
-   # Config for cleanshutd
-   trigger_pin=17
-   led_pin=17
-   poweroff_pin=27  # Changed from default (4) to GPIO27
-   hold_time=1
-   shutdown_delay=0
-   polling_rate=1
-   ```
 
 There are 2 ways to to force the pull-up configuration.
 
 
-#### Add instruction to /boot/config.txt
+#### 1. Add instruction to /boot/config.txt
 
 Adding the following to `/boot/config.txt`:
    ```bash
@@ -95,7 +98,7 @@ Adding the following to `/boot/config.txt`:
    ```
 This unfortunately did not work for me
 
-#### Creating a Service for GPIO27 Pull-Up
+#### 2. Creating a Service for GPIO27 Pull-Up
 
 1. Create a new script to force the pull-up on GPIO27:
 
@@ -165,9 +168,20 @@ GPIO 27: level=1 fsel=0 func=INPUT
 
 ---
 
-## GPIO Button Configuration
+## Phoniebox Installation
 
-Below is an example configuration for GPIO buttons:
+To install phoniebox software, you can simply use the one line install command you can find in the main [documentation](https://github.com/MiczFlor/RPi-Jukebox-RFID/wiki/INSTALL#one-line-install-command).
+```bash
+cd; rm install-jukebox.sh; wget https://raw.githubusercontent.com/MiczFlor/RPi-Jukebox-RFID/master/scripts/installscripts/install-jukebox.sh; chmod +x install-jukebox.sh; ./install-jukebox.sh
+```
+
+It asks some questions and takes approximately 15minutes to install. 
+
+
+### GPIO configuration
+
+Below is my configuration for the GPIO buttons, which can be found in the file: `~/RPi-Jukebox-RFID/settings/gpio_settings.ini`. Note that the [documentation](https://github.com/MiczFlor/RPi-Jukebox-RFID/blob/develop/components/gpio_control/README.md) contains examples with much more advance settings, but for my case those simple buttons were enough.
+After making changes, remember to restart the service using the command: `sudo systemctl restart phoniebox-gpio-control`
 
 ```
 [DEFAULT]
@@ -215,8 +229,9 @@ functionCall: functionCallVolU
 
 ## References
 
-Special thanks to the original Phoniebox project and all the tutorials and videos, especially:
+Special thanks to the original [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID/) project and all the tutorials, I could find online that helped me setup my OnOff shim:
 * [Kobold im Kopf Tutorial](https://koboldimkopf.wordpress.com/2020/01/10/tutorial-phoniebox/)
+* [SplittScheid Tutorial](https://splittscheid.de/phoniebox-bauanleitung-toniebox-alternative/)
 * [YouTube Tutorial](https://www.youtube.com/watch?v=9S8yvfvFSNg)
 
 
