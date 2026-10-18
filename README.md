@@ -4,6 +4,12 @@ This is the [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) I created 
 
 ![phoniebox_mouse](assets/phoniebox_mouse.jpg)
 
+[Watch the video on YouTube](https://www.youtube.com/shorts/znsAAv1EgLk)
+
+<iframe width="560" height="315" src="https://www.youtube.com/shorts/znsAAv1EgLk"
+frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+</iframe>
+
 ## Table of Contents
 * [Hardware](#hardware)
 * [Wiring](#wiring)
@@ -32,6 +38,10 @@ This is the [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) I created 
 
 ![Wiring diagram](assets/wiring.svg)
 
+Same wiring, seen from above as it looks on the boards (pin numbers are written on the pads, the OnOff SHIM pads are numbered like the Pi header):
+
+![Wiring on the boards](assets/wiring-board.svg)
+
 Pin numbers below are **physical pin numbers** (1–40) on the Raspberry Pi header. GPIO names are BCM numbers, which are the ones used in the config files.
 
 ### OnOff SHIM
@@ -41,32 +51,32 @@ Pin numbers below are **physical pin numbers** (1–40) on the Raspberry Pi head
 | 2 (5V) | **2** (5V) | Power from the SHIM to the Pi |
 | 6 (GND) | **6** (GND) | Ground |
 | 7 (power-off) | **13** (GPIO27) | Pulled low by the Pi at the end of shutdown → the SHIM cuts power. Default is pin 7 (GPIO4), moved to GPIO27 because GPIO4 is damaged |
-| 9 (GND) | **9** (GND) | Ground |
-| 11 (trigger) | **11** (GPIO17) | The SHIM pulls it **low** when the button is pressed → the Pi shuts down |
+| 9 (GND) | **9** (GND) | Ground (black/white striped wire) |
+| 11 (trigger) | **11** (GPIO17) — white wire | The SHIM pulls it **low** when the button is pressed → the Pi shuts down |
 
 ### Illuminated on/off button
 
 | Button wire | Connected to | Role |
 |---|---|---|
 | Switch | OnOff SHIM button pads | Press to power on, hold ~1 s to shut down |
-| LED + | Pi **pin 17** (3.3V) | LED is lit whenever the Pi is powered → shows that the battery is not empty |
-| LED − | Pi **pin 20** (GND) | Ground |
+| LED + (white wire) | Pi **pin 17** (3.3V) | LED is lit whenever the Pi is powered → shows that the battery is not empty |
+| LED − (grey wire) | Pi **pin 20** (GND) | Ground |
 
 No software is needed for the LED: it lights up as soon as the SHIM powers the Pi and turns off when the SHIM cuts power.
 If the LED in the button has no built-in resistor, add a 220–330 Ω resistor in series.
 
 ### Phoniebox buttons
 
-Each button has one wire to a GPIO and the other wire to a **common ground on pin 39**.
+Buttons on the box, from left to right: Random, Previous, Play/Pause, Next, Volume −, Volume +, then the On/Off button. Each push button has one wire to a GPIO and the other wire to a **common ground on pin 39**.
 
 | Button | Raspberry Pi pin | GPIO (BCM) |
 |---|---|---|
+| Random folder | 40 | GPIO21 |
 | Previous | 32 | GPIO12 *(was GPIO5, damaged)* |
 | Play / Pause | 31 | GPIO6 |
 | Next | 33 | GPIO13 |
 | Volume − | 35 | GPIO19 |
 | Volume + | 37 | GPIO26 |
-| Random folder | 40 | GPIO21 |
 | *(common ground)* | 39 | GND |
 
 > ⚠️ Always unplug the power before connecting or disconnecting wires on the GPIO header. A wire touching the wrong pin (e.g. 5V on a GPIO) can permanently damage the pin.
